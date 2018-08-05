@@ -1,14 +1,81 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
-  <meta charset="UTF-8">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <title>Thread Manager Spa</title>
-  <script type="text/javascript" src="thread-management-functions.js"></script>
-  <script type="text/javascript" src="prepopulate-data.js"></script>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <title>Thread Manager</title>
 
 </head>
-<body>
-  Hi!
+<body onhashchange="onHashChange()">
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#list/all">Thread Manager</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#list/all">All Threads</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#list/my-to-do">
+            My To Do
+            <span class="badge badge-light">8</span>
+            <span class="sr-only">threads open</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#list/follow-ups">Follow Ups</a>
+        </li>
+      </ul>
+      <div class="my-2 my-lg-0 navbar-nav">
+        <div class="form-inline nav-item input-group">
+          <input class="form-control" type="text" placeholder="Search Threads" aria-label="Search Threads">
+          <div class="input-group-append">
+            <button class="btn btn-outline-primary" type="button">Search</button>
+          </div>
+        </div>
+        <a class="nav-link" href="#settings">Settings</a>
+      </div>
+    </div>
+  </nav>
+
+  <main role="main" id="mainContent">
+    <div class="container">
+      <h1 class="text-center">Loading...</h1>
+    </div>
+  </main>
+
+  <script>
+    // Cross Page Globals
+    var pageManager_ViewLoaders = {}; // Please fill with functions which handle a string param (the rest of the hash)
+  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="js/utils.js"></script>
+  <script type="text/javascript" src="js/thread-management-functions.js"></script>
+  <script type="text/javascript" src="js/page-manager.js"></script>
+  <script type="text/javascript" src="js/prepopulate-data.js"></script>
+  <script type="text/javascript" src="js/list-views.js"></script>
+  <script type="text/javascript" src="js/settings-view.js"></script>
+  <script type="text/javascript" src="js/welcome-view.js"></script>
+  <script>
+    onPageLoad_PageManager();
+    onPageLoad_ListViews();
+    onPageLoad_SettingsView();
+    onPageLoad_WelcomeView();
+
+    // This must be the last thing to be called on the page.
+    loadDefaultView();
+  </script>
 </body>
 </html>

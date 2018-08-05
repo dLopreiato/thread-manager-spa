@@ -9,3 +9,6 @@ I plan on building this as a Single Page App, where users can save their tasks t
 
 # Contributing #
 At this moment, I'm not accepting contributions. This is mostly because I don't have the time to write out an entire outline of my vision.
+
+# Developing #
+Run ```npm start``` in the app directory to begin developing.

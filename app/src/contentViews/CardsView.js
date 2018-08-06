@@ -4,11 +4,11 @@ import ThreadCard from './ThreadCard';
 class CardsView extends Component {
   render() {
     return (
-      <main role="main" class="container-fluid">
+      <main role="main" className="container-fluid">
         <div>
-          <h1 class="text-center pb-3">Follow Ups</h1>
+          <h1 className="text-center pb-3">Follow Ups</h1>
         </div>
-        <div class="card-columns">
+        <div className="card-columns">
           <ThreadCard />
           <ThreadCard />
           <ThreadCard />

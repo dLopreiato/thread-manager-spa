@@ -21,10 +21,15 @@ class App extends Component {
   }
 
   /**
-   * @returns {Array(Thread)} A list of threads to start the application with.
+   * @returns {Thread[]} A list of threads to start the application with.
    */
   initializeThreads() {
     // for now, prepopulate threads
+    var thread6 = new Thread();
+    thread6.name = 'Child Thread that is finished';
+    thread6.waitingOn = 'Me';
+    thread6.completed = new Date();
+
     var thread5 = new Thread('a');
     thread5.name = 'Child Thread (child of child thread)';
     thread5.waitingOn = 'Me';
@@ -42,6 +47,7 @@ class App extends Component {
     var thread2 = new Thread();
     thread2.name = 'Child Thread (Waiting on myself)';
     thread2.waitingOn = 'Me';
+    thread2.addDependency(thread6);
 
     var thread1 = new Thread();
     thread1.name = 'Child Thread (Waiting on someone else)';
@@ -58,7 +64,7 @@ class App extends Component {
     thread0.addDependency(thread3);
     thread0.addDependency(thread4);
 
-    return [thread0, thread1, thread2, thread3, thread4, thread5];
+    return [thread0, thread1, thread2, thread3, thread4, thread5, thread6];
   }
 
   getThread(id) {
@@ -70,9 +76,24 @@ class App extends Component {
       <Router>
         <div>
           <NavigationBar />
-          <Route path="/list/all" render={() => <CardsView threads={this.state.threads} />} />
+
+          <Route path="/list/all" render={() =>
+            <CardsView
+              threads={this.state.threads}
+              title="All Threads" />} />
+          
+          <Route path="/list/my-to-do" render={() =>
+            <CardsView
+              threads={this.state.threads.filter((t) => t.isCompletableByMe())}
+              title="My Threads" />} />
+
+          <Route path="/list/follow-ups" render={() =>
+            <CardsView
+              threads={this.state.threads.filter((t) => t.needsFollowUp())}
+              title="Follow Ups" />} />
+
           <Route path="/thread/:id" render={({ match }) => <ThreadView thread={this.getThread(match.params.id)} />} />
-          <Route path="/welcome" render={() => <WelcomeView />} />
+          <Route exact path="/" render={() => <WelcomeView />} />
           <Route path="/settings" render={() => <SettingsView />} />
         </div>
       </Router>

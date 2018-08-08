@@ -6,14 +6,10 @@ class CardsView extends Component {
     return (
       <main role="main" className="container-fluid">
         <div>
-          <h1 className="text-center pb-3">Follow Ups</h1>
+          <h1 className="text-center pb-3">{this.props.title}</h1>
         </div>
         <div className="card-columns">
-          <ThreadCard />
-          <ThreadCard />
-          <ThreadCard />
-          <ThreadCard />
-          <ThreadCard />
+          {this.props.threads.map((thread) => <ThreadCard thread={thread} key={thread.id} />)}
         </div>
       </main>
     );

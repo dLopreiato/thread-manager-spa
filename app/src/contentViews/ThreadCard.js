@@ -3,10 +3,6 @@ import {Link} from 'react-router-dom';
 
 class ThreadCard extends Component {
 
-  notImplemented(event) {
-    console.warn('onChange not implemented');
-  }
-
   getDependencyPills() {
     const maxPills = 3;
 
@@ -33,8 +29,9 @@ class ThreadCard extends Component {
       );
     }
     else {
+      const buttonText = this.props.thread.allDependenciesAreResolved() ? 'Complete' : 'Force Complete';
       return (
-        <button className="btn btn-success btn-sm float-right" type="button" onClick={this.notImplemented} >Complete</button>
+        <button className="btn btn-success btn-sm float-right" type="button" onClick={this.props.threadCompleteHandler} >{buttonText}</button>
       );
     }
   }

@@ -13,7 +13,7 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.handleThreadChange = this.handleThreadChange.bind(this);
+    this.handleThreadUpdate = this.handleThreadUpdate.bind(this);
     this.handleThreadComplete = this.handleThreadComplete.bind(this);
 
     this.state = {
@@ -23,46 +23,57 @@ class App extends Component {
 
   }
 
-  handleThreadChange(threadId, field, newValue) {
-    var oldThread = this.state.threads.find(x => x.id === threadId);
+  // TODO: Handle reference changes
+  handleThreadUpdate(newThread) {
+    var oldThread = this.state.threads.find(x => x.id === newThread.id);
     if (!oldThread) {
       console.error('this thread does not exist');
       return;
     }
-    var newThread = oldThread.clone();
-    newThread[field] = newValue;
+    else {
+      var newThreads = this.state.threads.slice();
+      for (let i = 0; i < newThreads.length; i += 1) {
+        let relevantThread = newThreads[i];
+        
+        if (relevantThread === oldThread) {
+          newThreads[i] = newThread;
+        }
+        
+        else {
+          // WARNING: WE ARE MUTATING OBJECTS.
+          // This is explicitly told not to do in the React documentation but we are doing it anyway. This is because
+          // this particular field is a reference field. If we were to strictly follow the rules, we would have to either
+          // use soft references (use the string id, and then perform a look up on every get), or we would have to
+          // recreate the entire tree. To avoid both of these (admittedly marginal) performance hits, we will be
+          // modifying references in objects.
 
-    var newThreads = this.state.threads.slice();
-    for (let i = 0; i < newThreads.length; i += 1) {
-      let relevantThread = newThreads[i];
-      
-      if (relevantThread === oldThread) {
-        newThreads[i] = newThread;
-      }
-      
-      else {
-        for (let j = 0; j < newThread.dependentOn.length; j += 1) {
-          let otherThread = newThread.dependentOn[j];
-          for (let k = 0; k < otherThread.dependencyOf.length; k += 1) {
-            if (otherThread.dependencyOf[k] === oldThread) {
-              otherThread.dependencyOf[k] = newThread;
+          // For clarity on what these two for loops do: We go thread every dependency on this thread (which requires 2
+          // for loops since these are double linked lists), and modify the references of that dependency to point to the
+          // newly cloned thread instead of the old thread.
+          for (let j = 0; j < newThread.dependentOn.length; j += 1) {
+            let otherThread = newThread.dependentOn[j];
+            for (let k = 0; k < otherThread.dependencyOf.length; k += 1) {
+              if (otherThread.dependencyOf[k] === oldThread) {
+                otherThread.dependencyOf[k] = newThread;
+              }
+            }
+          }
+
+          for (let j = 0; j < newThread.dependencyOf.length; j += 1) {
+            let otherThread = newThread.dependencyOf[j];
+            for (let k = 0; k < otherThread.dependentOn.length; k += 1) {
+              if (otherThread.dependentOn[k] === oldThread) {
+                otherThread.dependentOn[k] = newThread;
+              }
             }
           }
         }
 
-        for (let j = 0; j < newThread.dependencyOf.length; j += 1) {
-          let otherThread = newThread.dependencyOf[j];
-          for (let k = 0; k < otherThread.dependentOn.length; k += 1) {
-            if (otherThread.dependentOn[k] === oldThread) {
-              otherThread.dependentOn[k] = newThread;
-            }
-          }
-        }
       }
-
     }
 
     this.setState({threads: newThreads});
+    console.log('thread saved');
   }
 
   /**
@@ -70,7 +81,14 @@ class App extends Component {
    * @param {String} threadId The id of the thread you want to mark completed.
    */
   handleThreadComplete(threadId) {
-    this.handleThreadChange(threadId, 'completed', new Date());
+    var oldThread = this.state.threads.find(x => x.id === threadId);
+    if (!oldThread) {
+      console.error('this thread does not exist');
+      return;
+    }
+    var newThread = oldThread.clone();
+    newThread.completed = new Date();
+    this.handleThreadUpdate(newThread);
   }
 
   /**
@@ -134,7 +152,7 @@ class App extends Component {
             <CardsView
               threads={this.state.threads}
               title="All Threads"
-              threadCompleteHandler={(threadId) => this.handleThreadChange(threadId, 'completed', new Date())} />} />
+              threadCompleteHandler={this.handleThreadComplete} />} />
           
           <Route path="/list/my-to-do" render={() =>
             <CardsView
@@ -149,8 +167,15 @@ class App extends Component {
               title="Follow Ups"
               threadCompleteHandler={this.handleThreadComplete} />} />
 
+          <Route path="/thread/:id" render={({ match }) =>
+            <ThreadView
+              // Without the key attribute, a new ThreadView will not be drawn if linked to within another ThreadView
+              key={match.params.id} 
+              thread={this.getThread(match.params.id)}
+              threadUpdateHandler={this.handleThreadUpdate}
+              allThreads={this.state.threads} />}
+              />
 
-          <Route path="/thread/:id" render={({ match }) => <ThreadView thread={this.getThread(match.params.id)} />} />
           <Route exact path="/" render={() => <WelcomeView />} />
           <Route path="/settings" render={() => <SettingsView />} />
         </div>

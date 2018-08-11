@@ -10,7 +10,6 @@ class CardsView extends Component {
   }
 
   handleThreadComplete(threadId) {
-    console.log("cardsView.handleThreadComplete");
     this.props.threadCompleteHandler(threadId);
   }
 

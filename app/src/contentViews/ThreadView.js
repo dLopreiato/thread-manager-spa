@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
-import {Link, Prompt} from 'react-router-dom';
+import {Prompt} from 'react-router-dom';
 
 class ThreadView extends Component {
 
@@ -43,7 +43,7 @@ class ThreadView extends Component {
     for (let i = 0; i < references.length; i += 1) {
       retVal.push({
         value: references[i].id,
-        label: <span key={references[i].id}>{references[i].name}<Link to={"/thread/" + references[i].id}>&#8594;</Link></span>
+        label: <span key={references[i].id}>{references[i].name}</span>
       });
     }
     return retVal;

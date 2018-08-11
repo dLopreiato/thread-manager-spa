@@ -82,32 +82,94 @@ class Thread
   }
 
   /**
-   * Adds another thread as a dependency of this thread (one which must be completed before this thread).
-   * @param {Thread} thread The thread which must be completed before this thread may begin work
+   * Method which mutates the dependency threads to replace this thread with the given thread.
+   * @param {Thread} newThread The thread which will replace this thread.
    */
-  addDependency(thread)
+  swapWith(newThread)
   {
-    thread.dependencyOf.push(this);
-    this.dependentOn.push(thread);
+    // Validate this can be swapped.
+    if (newThread.id !== this.id)
+    {
+      throw new Error('Thead being hot swapped must have the same id');
+    }
+
+    for (let i = 0; i < this.dependentOn.length; i += 1)
+    {
+      let otherThread = this.dependentOn[i];
+      let indexOfSelfInOther = otherThread.dependencyOf.indexOf(this);
+      otherThread.dependencyOf[indexOfSelfInOther] = newThread;
+    }
+
+    for (let i = 0; i < this.dependencyOf.length; i += 1)
+    {
+      let otherThread = this.dependencyOf[i];
+      let indexOfSelfInOther = otherThread.dependentOn.indexOf(this);
+      otherThread.dependentOn[indexOfSelfInOther] = newThread;
+    }
   }
 
   /**
-   * Removes some other thread as a dependency of this thread.
+   * Returns two new threads where the given thread is added as a dependency of this thread.
+   * @param {Thread} thread The thread which must be completed before this thread may begin work
+   * @returns {Thread[]} Two new threads which correlate to the updated version of this thread, and the updated version
+   *   of the dependency. In order to actually make a change to the thread tree, these threads must be swapped.
+   */
+  addDependency(thread)
+  {
+    let newParent = this.clone();
+    let newChild = thread.clone();
+    
+    newParent.dependentOn.push(newChild);
+    newChild.dependencyOf.push(newParent);
+
+    return {thisReplacement: newParent, parameterReplacement: newChild};
+  }
+
+  /**
+   * Returns two new threads where the given thread is no longer a dependency of this thread.
    * @param {Thread} thread The thread which is now unrelated to this thread
+   * @returns {Thread[]} Two new threads which correlate to the updated version of this thread, and the updated version
+   *   of the former dependency. In order to actually make a change to the thread tree, these threads must be swapped.
    */
   removeDependency(thread)
   {
-    var indexOfDependency = this.dependentOn.findIndex(function(e) { return e.id === thread.id; });
-    if (indexOfDependency > -1)
+    let newNonParent = this.clone();
+    let newNonChild = thread.clone();
+
+    newNonParent.dependentOn.splice(newNonParent.dependentOn.indexOf(thread), 1);
+    newNonChild.dependencyOf.splice(newNonChild.dependencyOf.indexOf(this), 1);
+
+    return {thisReplacement: newNonParent, parameterReplacement: newNonChild};
+  }
+
+  /**
+   * Returns a list of dependency mismatches (if any exist) that stem from this thread.
+   * @returns {String[]} Empty array if no dependency mismatches exist.
+   */
+  validateDependencies()
+  {
+    var retVal = [];
+    for (let i = 0; i < this.dependentOn.length; i += 1)
     {
-      this.dependentOn.splice(indexOfDependency, 1);
-      var thisThread = this;
-      var indexOfThisThreadInOthersDependencyOf = thread.dependencyOf.findIndex(function(e) { return e.id === thisThread.id; });
-      if (indexOfThisThreadInOthersDependencyOf > -1)
+      let otherThread = this.dependentOn[i];
+
+      if (otherThread.dependencyOf.indexOf(this) < 0)
       {
-        thread.dependencyOf.splice(indexOfThisThreadInOthersDependencyOf, 1);
+        retVal.push(otherThread.id + ' exists in ' + this.id + '\'s dependentOn field. The reverse is not true.');
       }
     }
+
+    for (let i = 0; i < this.dependencyOf.length; i += 1)
+    {
+      let otherThread = this.dependencyOf[i];
+
+      if (otherThread.dependentOn.indexOf(this) < 0)
+      {
+        retVal.push(otherThread.id + ' exists in ' + this.id + '\'s dependencyOf field. The reverse is not true.');
+      }
+    }
+
+    return retVal;
   }
 
   /**
@@ -123,8 +185,8 @@ class Thread
     retVal.realized = this.realized;
     retVal.nextExpectedUpdate = this.nextExpectedUpdate;
     retVal.completed = this.completed;
-    retVal.dependentOn = this.dependentOn;
-    retVal.dependencyOf = this.dependencyOf;
+    retVal.dependentOn = this.dependentOn.slice();
+    retVal.dependencyOf = this.dependencyOf.slice();
     return retVal;
   }
 

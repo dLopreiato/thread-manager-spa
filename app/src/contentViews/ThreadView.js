@@ -62,7 +62,7 @@ class ThreadView extends Component {
     }
     confirmText += 'Delete this?';
     if (window.confirm(confirmText)) {
-      console.error('implement delete thread');
+      this.props.deleteThreadHandler();
     }
   }
 

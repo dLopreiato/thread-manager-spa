@@ -15,6 +15,7 @@ class App extends Component {
 
     this.handleThreadUpdate = this.handleThreadUpdate.bind(this);
     this.handleThreadComplete = this.handleThreadComplete.bind(this);
+    this.handleThreadDelete = this.handleThreadDelete.bind(this);
 
     this.state = {
       settings: {},
@@ -120,6 +121,7 @@ class App extends Component {
 
     this.setState({threads: newThreads});
     console.log('thread saved');
+    return newThreads;
   }
 
   /**
@@ -129,12 +131,29 @@ class App extends Component {
   handleThreadComplete(threadId) {
     var oldThread = this.state.threads.find(x => x.id === threadId);
     if (!oldThread) {
-      console.error('this thread does not exist');
-      return;
+      throw new Error('this thread does not exist');
     }
     var newThread = oldThread.clone();
     newThread.completed = new Date();
     this.handleThreadUpdate(newThread);
+  }
+
+  handleThreadDelete(threadId) {
+    let oldThread = this.state.threads.find(t => t.id === threadId);
+    if (!oldThread) {
+      throw new Error('this thread does not exist');
+    }
+
+    let targetThread = oldThread.clone();
+    targetThread.dependencyOf = [];
+    targetThread.dependentOn = [];
+    let threadsWithoutDependency = this.handleThreadUpdate(targetThread);
+    
+
+    let newThreads = threadsWithoutDependency.slice();
+    let oldThreadIndex = newThreads.findIndex(t => t.id === threadId);
+    newThreads.splice(oldThreadIndex, 1);
+    this.setState({threads: newThreads});
   }
 
   /**
@@ -227,7 +246,8 @@ class App extends Component {
               key={match.params.id} 
               thread={this.getThread(match.params.id)}
               threadUpdateHandler={this.handleThreadUpdate}
-              allThreads={this.state.threads} />}
+              allThreads={this.state.threads}
+              deleteThreadHandler={() => this.handleThreadDelete(match.params.id)} />}
               />
 
           <Route exact path="/" render={() => <WelcomeView />} />

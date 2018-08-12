@@ -134,7 +134,6 @@ class App extends Component {
     var thread4 = new Thread();
     thread4.name = 'Child Thread (further dependent on child thread)';
     thread4.waitingOn = 'Me';
-    thread4.addDependency(thread5);
 
     var thread3 = new Thread();
     thread3.name = 'Child Thread (has been completed)';
@@ -144,7 +143,6 @@ class App extends Component {
     var thread2 = new Thread();
     thread2.name = 'Child Thread (Waiting on myself)';
     thread2.waitingOn = 'Me';
-    thread2.addDependency(thread6);
 
     var thread1 = new Thread();
     thread1.name = 'Child Thread (Waiting on someone else)';
@@ -156,10 +154,16 @@ class App extends Component {
     thread0.name = 'Root Thread';
     thread0.waitingOn = 'Me';
     thread0.nextExpectedUpdate = new Date();
-    thread0.addDependency(thread1);
-    thread0.addDependency(thread2);
-    thread0.addDependency(thread3);
-    thread0.addDependency(thread4);
+
+    thread0.dependentOn = [thread1, thread2, thread3, thread4];
+    thread1.dependencyOf = [thread0];
+    thread2.dependencyOf = [thread0];
+    thread2.dependentOn = [thread6];
+    thread3.dependencyOf = [thread0];
+    thread4.dependencyOf = [thread0];
+    thread4.dependentOn = [thread5];
+    thread5.dependencyOf = [thread4];
+    thread6.dependencyOf = [thread2];
 
     return [thread0, thread1, thread2, thread3, thread4, thread5, thread6, thread7];
   }

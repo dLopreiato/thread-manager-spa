@@ -88,10 +88,34 @@ class App extends Component {
       finalChanges[changedThreads.parameterReplacement.id] = changedThreads.parameterReplacement;
     }
 
-    // TODO: Handle reference removals
+    let dependentOnDeletions = oldThread.dependentOn.filter(t => !targetThread.dependentOn.includes(t));
+    for (let formerDependentOn of dependentOnDeletions) {
+      let newestThread = finalChanges[oldThread.id];
+      let newestNonDependentOn = finalChanges[formerDependentOn.id] ? finalChanges[formerDependentOn.id] : formerDependentOn;
 
+      let changedThreads = newestThread.removeDependency(newestNonDependentOn);
 
-    console.log('Final changes', finalChanges);
+      newestThread.swapWith(changedThreads.thisReplacement);
+      newestNonDependentOn.swapWith(changedThreads.parameterReplacement);
+
+      finalChanges[changedThreads.thisReplacement.id] = changedThreads.thisReplacement;
+      finalChanges[changedThreads.parameterReplacement.id] = changedThreads.parameterReplacement;
+    }
+
+    let dependencyOfDeletions = oldThread.dependencyOf.filter(t => !targetThread.dependencyOf.includes(t));
+    for (let formerDependencyOf of dependencyOfDeletions) {
+      let newestThread = finalChanges[oldThread.id];
+      let newestNonDependencyOf = finalChanges[formerDependencyOf.id] ? finalChanges[formerDependencyOf.id] : formerDependencyOf;
+
+      let changedThreads = newestNonDependencyOf.removeDependency(newestThread);
+
+      newestNonDependencyOf.swapWith(changedThreads.thisReplacement);
+      newestThread.swapWith(changedThreads.parameterReplacement);
+
+      finalChanges[changedThreads.thisReplacement.id] = changedThreads.thisReplacement;
+      finalChanges[changedThreads.parameterReplacement.id] = changedThreads.parameterReplacement;
+    }
+
     var newThreads = this.state.threads.map(x => finalChanges[x.id] ? finalChanges[x.id] : x);
 
     this.setState({threads: newThreads});

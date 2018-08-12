@@ -165,10 +165,11 @@ class ThreadView extends Component {
           <div className="col-sm-9" id="dependencyOf">
             <Select
               placeholder="Select a Thread..."
-              isMulti={true}
+              options={this.renderReferencesForValue(this.props.allThreads)
+                .filter(x => this.state.draftThread.dependencyOf.findIndex(t => t.id === x.value))}
               value={this.renderReferencesForValue(this.state.draftThread.dependencyOf)}
-              menuIsOpen={false} // Even though this is readonly, the menu will open and flash if the user clicks on the link
-              />
+              isMulti={true}
+              onChange={(e) => this.referenceChangeHandler('dependencyOf', e)} />
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import {HashRouter as Router, Route} from 'react-router-dom';
+import {HashRouter as Router, Route, Redirect} from 'react-router-dom';
 import NavigationBar from './navigation/NavigationBar';
 import CardsView from './contentViews/CardsView';
 import WelcomeView from './contentViews/WelcomeView';
@@ -249,6 +249,18 @@ class App extends Component {
               allThreads={this.state.threads}
               deleteThreadHandler={() => this.handleThreadDelete(match.params.id)} />}
               />
+
+          <Route path="/new-thread" render={() => {
+            let newThreadList = this.state.threads.slice();
+            let newThread = new Thread();
+            newThread.waitingOn = 'Me';
+            newThreadList.push(newThread);
+            this.setState({threads: newThreadList});
+
+            return (
+              <Redirect to={'/thread/' + newThread.id} />
+            );
+            }} />
 
           <Route exact path="/" render={() => <WelcomeView />} />
           <Route path="/settings" render={() => <SettingsView />} />

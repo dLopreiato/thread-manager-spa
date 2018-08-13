@@ -18,6 +18,7 @@ class NavigationBar extends Component {
               <NavigationLink to="/list/follow-ups" text="Follow Ups" />
             </ul>
             <ul className="my-2 my-lg-0 navbar-nav">
+              <Link to='/new-thread' className='btn btn-primary' role='button'>New Thread</Link>
               <NavigationLink to="/settings" text="Settings" />
             </ul>
           </div>

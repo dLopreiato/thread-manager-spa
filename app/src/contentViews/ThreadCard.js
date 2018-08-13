@@ -41,7 +41,7 @@ class ThreadCard extends Component {
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">
-            <Link className="card-link" to={"/thread/" + this.props.thread.id}>{this.props.thread.name}</Link>
+            <Link className="card-link" to={"/thread/" + this.props.thread.id}>{this.props.thread.name ? this.props.thread.name : '[No Name]'}</Link>
           </h5>
         </div>
         {this.props.thread.waitingOn !== "Me" &&

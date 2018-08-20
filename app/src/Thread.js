@@ -191,29 +191,35 @@ class Thread
   }
 
   /**
-   * Will replace all the flattened dependencies with the real objects.
+   * Will create a list of threads with appropriate references from a list of Plain Old Json Objects.
    * @param {Array} allThreads A complete list of threads.
    * @returns {Void} This returns nothing because it will mutate the input.
    */
-  static hydrateThreadList(allThreads)
+  static generateFromJsonList(allThreads)
   {
-    var keyedById = {};
-    for (var i = 0; i < allThreads.length; i++)
+    let retVal = [];
+    let keyedById = {};
+
+    for (let threadData of allThreads)
     {
-      keyedById[allThreads[i].id] = allThreads[i];
+      // Generate the new threads, and key into dictionary for later use
+      let newThread = Thread.fromPojo(threadData);
+      keyedById[newThread.id] = newThread;
+      retVal.push(newThread);
     }
 
-    for (i = 0; i < allThreads.length; i++)
+    for (let i = 0; i < retVal.length; i++)
     {
-      var thisThread = allThreads[i];
-      var dependencyOf = [];
-      for (var j = 0; j < thisThread.dependencyOf.length; j++)
+      // Replace the ids in the serialized thread with the actual thread (from dictionary)
+      let thisThread = retVal[i];
+      let dependencyOf = [];
+      for (let j = 0; j < thisThread.dependencyOf.length; j++)
       {
         dependencyOf.push(keyedById[thisThread.dependencyOf[j]]);
       }
 
-      var dependentOn = [];
-      for (j = 0; j < allThreads[i].dependentOn.length; j++)
+      let dependentOn = [];
+      for (let j = 0; j < retVal[i].dependentOn.length; j++)
       {
         dependentOn.push(keyedById[thisThread.dependentOn[j]]);
       }
@@ -221,6 +227,31 @@ class Thread
       thisThread.dependencyOf = dependencyOf;
       thisThread.dependentOn = dependentOn;
     }
+
+    return retVal;
+  }
+
+  /**
+   * Generates a thread from the given Plain Old JavaScript Object (POJO)
+   * @param {Object} obj Any object which you want to extract the thread fields from
+   * @returns {Thread}
+   */
+  static fromPojo(obj)
+  {
+    let retVal = new Thread();
+    if (obj.id)
+    {
+      retVal.id = obj.id;
+    }
+    retVal.name = obj.name === undefined ? '' : obj.name;
+    retVal.waitingOn = obj.waitingOn === undefined ? '' : obj.waitingOn;
+    retVal.notes = obj.notes === undefined ? '' : obj.notes;
+    retVal.realized = !obj.realized ? null : new Date(obj.realized);
+    retVal.nextExpectedUpdate = !obj.nextExpectedUpdate ? null : new Date(obj.nextExpectedUpdate);
+    retVal.completed = !obj.completed ? null : new Date(obj.completed);
+    retVal.dependentOn = obj.dependentOn ? obj.dependentOn.slice() : [];
+    retVal.dependencyOf = obj.dependencyOf ? obj.dependencyOf.slice() : [];
+    return retVal;
   }
 
   /**

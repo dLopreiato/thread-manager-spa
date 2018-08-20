@@ -7,6 +7,7 @@ import WelcomeView from './contentViews/WelcomeView';
 import SettingsView from './contentViews/SettingsView';
 import ThreadView from './contentViews/ThreadView';
 import Thread from './Thread';
+import LocalProvider from './storageProviders/LocalProvider';
 
 class App extends Component {
   
@@ -16,12 +17,32 @@ class App extends Component {
     this.handleThreadUpdate = this.handleThreadUpdate.bind(this);
     this.handleThreadComplete = this.handleThreadComplete.bind(this);
     this.handleThreadDelete = this.handleThreadDelete.bind(this);
+    this.saveThreads = this.saveThreads.bind(this);
+    this.handleKeyUp = this.handleKeyUp.bind(this);
+
+    let provider = new LocalProvider();
+    let path = 'placeholder';
 
     this.state = {
-      settings: {},
-      threads: this.initializeThreads()
+      settings: {provider: provider, providerPath: path},
+      threads: this.initializeThreads(provider, path)
     };
 
+    document.addEventListener('keydown', this.handleKeyUp, false);
+  }
+
+  handleKeyUp(e) {
+    if (e.ctrlKey && e.keyCode === 83) {
+      this.saveThreads();
+      e.preventDefault();
+      return false;
+    }
+  }
+
+  saveThreads() {
+    let serialized = JSON.stringify(this.state.threads, Thread.jsonReplacer);
+    this.state.settings.provider.setData(this.state.settings.providerPath, serialized);
+    console.log('saved');
   }
 
   /**
@@ -159,56 +180,10 @@ class App extends Component {
   /**
    * @returns {Thread[]} A list of threads to start the application with.
    */
-  initializeThreads() {
-    // for now, prepopulate threads
-    var thread7 = new Thread();
-    thread7.name = 'Independent Thread';
-    thread7.waitingOn = 'Me';
-
-    var thread6 = new Thread();
-    thread6.name = 'Child Thread that is finished';
-    thread6.waitingOn = 'Me';
-    thread6.completed = new Date();
-
-    var thread5 = new Thread('a');
-    thread5.name = 'Child Thread (child of child thread)';
-    thread5.waitingOn = 'Me';
-
-    var thread4 = new Thread();
-    thread4.name = 'Child Thread (further dependent on child thread)';
-    thread4.waitingOn = 'Me';
-
-    var thread3 = new Thread();
-    thread3.name = 'Child Thread (has been completed)';
-    thread3.waitingOn = 'Me';
-    thread3.completed = new Date();
-
-    var thread2 = new Thread();
-    thread2.name = 'Child Thread (Waiting on myself)';
-    thread2.waitingOn = 'Me';
-
-    var thread1 = new Thread();
-    thread1.name = 'Child Thread (Waiting on someone else)';
-    thread1.waitingOn = 'Someone else';
-    thread1.nextExpectedUpdate = new Date();
-    thread1.nextExpectedUpdate.setMonth(thread1.realized.getMonth() + 1);
-
-    var thread0 = new Thread ();
-    thread0.name = 'Root Thread';
-    thread0.waitingOn = 'Me';
-    thread0.nextExpectedUpdate = new Date();
-
-    thread0.dependentOn = [thread1, thread2, thread3, thread4];
-    thread1.dependencyOf = [thread0];
-    thread2.dependencyOf = [thread0];
-    thread2.dependentOn = [thread6];
-    thread3.dependencyOf = [thread0];
-    thread4.dependencyOf = [thread0];
-    thread4.dependentOn = [thread5];
-    thread5.dependencyOf = [thread4];
-    thread6.dependencyOf = [thread2];
-
-    return [thread0, thread1, thread2, thread3, thread4, thread5, thread6, thread7];
+  initializeThreads(provider, path) {
+    let data = provider.getData(path);
+    let flattenedThreads = JSON.parse(data);
+    return Thread.generateFromJsonList(flattenedThreads);
   }
 
   getThread(id) {

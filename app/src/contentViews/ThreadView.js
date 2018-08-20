@@ -26,7 +26,7 @@ class ThreadView extends Component {
   }
 
   renderDateForValue(date) {
-    if (date == null) {
+    if (!date) {
       return 'yyyy-mm-dd';
     }
     return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);

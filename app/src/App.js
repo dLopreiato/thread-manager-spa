@@ -33,14 +33,14 @@ class App extends Component {
 
   handleKeyUp(e) {
     if (e.ctrlKey && e.keyCode === 83) {
-      this.saveThreads();
+      this.saveThreads(this.state.threads);
       e.preventDefault();
       return false;
     }
   }
 
-  saveThreads() {
-    let serialized = JSON.stringify(this.state.threads, Thread.jsonReplacer);
+  saveThreads(threads) {
+    let serialized = JSON.stringify(threads, Thread.jsonReplacer);
     this.state.settings.provider.setData(this.state.settings.providerPath, serialized);
     console.log('saved');
   }
@@ -141,6 +141,7 @@ class App extends Component {
     var newThreads = this.state.threads.map(x => finalChanges[x.id] ? finalChanges[x.id] : x);
 
     this.setState({threads: newThreads});
+    this.saveThreads(newThreads);
     console.log('thread saved');
     return newThreads;
   }
@@ -175,6 +176,7 @@ class App extends Component {
     let oldThreadIndex = newThreads.findIndex(t => t.id === threadId);
     newThreads.splice(oldThreadIndex, 1);
     this.setState({threads: newThreads});
+    this.saveThreads(newThreads);
   }
 
   /**
@@ -234,6 +236,7 @@ class App extends Component {
             newThread.waitingOn = 'Me';
             newThreadList.push(newThread);
             this.setState({threads: newThreadList});
+            this.saveThreads(newThreadList);
 
             return (
               <Redirect to={'/thread/' + newThread.id} />

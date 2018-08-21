@@ -182,6 +182,9 @@ class App extends Component {
    */
   initializeThreads(provider, path) {
     let data = provider.getData(path);
+    if (!data) {
+      return [];
+    }
     let flattenedThreads = JSON.parse(data);
     return Thread.generateFromJsonList(flattenedThreads);
   }

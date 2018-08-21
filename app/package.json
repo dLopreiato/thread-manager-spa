@@ -1,7 +1,7 @@
 {
   "name": "thread-manager",
   "homepage": "https://dlopreiato.github.io/thread-manager-spa/",
-  "version": "0.1.0",
+  "version": "0.1.001",
   "private": true,
   "dependencies": {
     "ajv": "^6.5.2",

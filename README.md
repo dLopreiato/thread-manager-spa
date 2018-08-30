@@ -19,4 +19,4 @@ Open up your terminal and navigate to the ```/app``` directory of this repositor
 While you're in the ```/app``` directory, run ```npm run start``` to start up the node server. Since this project is built on React, the React Developer Tools ([Firefox](https://addons.mozilla.org/en-US/firefox/addon/react-devtools/), [Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)) are recommended.
 
 ## Building & Release ##
-Run ```npm run deploy```. This will push the changes to the master branch and push to origin.
+In the ```/app``` directory, run ```npm run deploy```. This will commit the build to the master branch and push to origin.

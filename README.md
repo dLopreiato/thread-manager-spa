@@ -3,12 +3,20 @@
 
 Thread Manager SPA is a task manager built for someone who has to keep track of a lot of threads. Not everything needed for a given project is in your power, sometimes you just have to wait for someone else to finish a task. Often times you'll have to reach out and reminder them that you are waiting. This task manager is meant to help with that!
 
-# Infrastructure #
+## Infrastructure ##
 
 I plan on building this as a Single Page App, where users can save their tasks to the cloud storage provider of their choice. Using OAuth implicit grants, we can host this app on GitHub for free and let anyone use it at any time. Think of it as a BYOS app (bring your own storage.)
 
-# Contributing #
+## Contributing ##
 At this moment, I'm not accepting contributions. This is mostly because I don't have the time to write out an entire outline of my vision.
 
 # Developing #
-Run ```npm start``` in the app directory to begin developing.
+
+## Setting Up Your Environment ##
+Open up your terminal and navigate to the ```/app``` directory of this repository. Run ```npm install```. You should be good to go!
+
+## Building & Developing ##
+While you're in the ```/app``` directory, run ```npm run start``` to start up the node server. Since this project is built on React, the React Developer Tools ([Firefox](https://addons.mozilla.org/en-US/firefox/addon/react-devtools/), [Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)) are recommended.
+
+## Building & Release ##
+First, run ```npm run build``` in the ```/app``` directory. This will generate the ```/app/build``` directory where the build is stored. Next, delete all of the existing content in ```/docs```, and copy the contents of the ```/app/build``` directory into the ```/docs``` directory. Commit the changes (and push to origin). Finally, create a release on GitHub.
